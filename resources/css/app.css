@@ -1,1 +1,59 @@
 @import "tailwindcss";
+
+/* FullCalendar 終日スロットの不要なスクロールバーを完全非表示 */
+.fc-timegrid-all-day .fc-scroller-harness,
+.fc-timegrid-all-day .fc-scroller,
+.fc-col-header .fc-scroller {
+    overflow: hidden !important;
+    max-height: none !important;
+}
+
+.fc-timegrid-all-day .fc-scroller::-webkit-scrollbar,
+.fc-col-header .fc-scroller::-webkit-scrollbar {
+    display: none !important;
+}
+
+/* カレンダー本体のスクロールバーをスッキリ美しくスタイリング */
+.fc-scroller::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+}
+
+.fc-scroller::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* カレンダーUIのテキスト選択および入力カーソル(Iビーム)の防止 */
+.fc,
+.fc * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+}
+
+/* クリック可能な日付セル・時間スロット・予定イベント */
+.fc-daygrid-day,
+.fc-daygrid-day-frame,
+.fc-timegrid-slot,
+.fc-timegrid-slot-lane,
+.fc-event,
+.fc-event * {
+    cursor: pointer !important;
+}
+
+/* タイトル・ヘッダー部分 */
+.fc-toolbar-title,
+.fc-col-header-cell,
+.fc-timegrid-axis {
+    cursor: default !important;
+}
+
+.fc-button {
+    cursor: pointer !important;
+}
