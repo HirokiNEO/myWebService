@@ -15,7 +15,19 @@
                 Googleカレンダーのように「日・週・月」で表示を切り替え、時間範囲やメモを設定してスケジュールを管理できます。
             </p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <!-- 期間切り替えボタン -->
+            <div class="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-medium border border-gray-200">
+                <button type="button" id="btnFilterAll" onclick="setDashboardFutureFilter(false)"
+                    class="px-3 py-1.5 rounded-lg transition font-semibold bg-white text-indigo-700 shadow-sm">
+                    すべての予定
+                </button>
+                <button type="button" id="btnFilterFuture" onclick="setDashboardFutureFilter(true)"
+                    class="px-3 py-1.5 rounded-lg transition text-gray-600 hover:text-gray-900">
+                    今日以降のみ
+                </button>
+            </div>
+
             <button type="button" onclick="openCreateTaskModal()"
                 class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition text-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,11 +38,53 @@
         </div>
     </div>
 
+    <!-- 共有URLバナー -->
+    <div class="bg-gradient-to-r from-indigo-50 via-white to-indigo-50/50 rounded-2xl p-5 border border-indigo-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                    カレンダー共有 &amp; 外部予約URL
+                </span>
+                <span class="text-xs text-gray-500">※既存のスケジュール名は非公開（「予定あり」表示）で安全に共有されます</span>
+            </div>
+            <p class="text-xs text-gray-600">
+                アカウントのない相手（クライアントや知人）にこのURLを送ると、空き時間を確認してスケジュール予約を入れてもらえます。
+            </p>
+        </div>
+        <div class="flex items-center gap-2 w-full md:w-auto">
+            <input type="text" id="shareUrlInput" readonly
+                value="{{ $user->share_url }}"
+                class="text-xs bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-700 w-full md:w-72 select-all focus:ring-2 focus:ring-indigo-500">
+            <button type="button" onclick="copyShareUrl()" id="copyShareBtn"
+                class="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition">
+                URLをコピー
+            </button>
+        </div>
+    </div>
+
     <!-- カレンダー表示エリア -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
         <div id="calendar"></div>
     </div>
 </div>
+
+<script>
+function copyShareUrl() {
+    const input = document.getElementById('shareUrlInput');
+    input.select();
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('copyShareBtn');
+        const orig = btn.textContent;
+        btn.textContent = 'コピー完了！';
+        btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+        setTimeout(() => {
+            btn.textContent = orig;
+            btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+        }, 2000);
+    });
+}
+</script>
 
 <!-- スケジュール追加・編集モーダル -->
 <div id="taskModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">

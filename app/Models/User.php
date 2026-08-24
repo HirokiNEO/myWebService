@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -21,6 +22,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'share_token',
+        'is_calendar_shared',
     ];
 
     /**
@@ -41,7 +44,21 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_calendar_shared' => 'boolean',
     ];
+
+    /**
+     * カレンダー共有URLアクセサ (常に有効なURLを安全に生成)
+     */
+    public function getShareUrlAttribute(): string
+    {
+        if (empty($this->share_token)) {
+            $this->share_token = Str::random(32);
+            $this->saveQuietly();
+        }
+
+        return route('calendar.share', ['token' => $this->share_token]);
+    }
 
     /**
      * ユーザーが所有するタスク・スケジュール一覧

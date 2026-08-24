@@ -185,6 +185,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    let isFutureOnly = false;
+
+    window.setDashboardFutureFilter = (futureOnly) => {
+        isFutureOnly = futureOnly;
+        const btnAll = document.getElementById('btnFilterAll');
+        const btnFuture = document.getElementById('btnFilterFuture');
+
+        if (futureOnly) {
+            btnFuture?.classList.add('bg-white', 'text-indigo-700', 'shadow-sm', 'font-semibold');
+            btnFuture?.classList.remove('text-gray-600');
+            btnAll?.classList.remove('bg-white', 'text-indigo-700', 'shadow-sm', 'font-semibold');
+            btnAll?.classList.add('text-gray-600');
+        } else {
+            btnAll?.classList.add('bg-white', 'text-indigo-700', 'shadow-sm', 'font-semibold');
+            btnAll?.classList.remove('text-gray-600');
+            btnFuture?.classList.remove('bg-white', 'text-indigo-700', 'shadow-sm', 'font-semibold');
+            btnFuture?.classList.add('text-gray-600');
+        }
+
+        calendar.refetchEvents();
+    };
+
     // FullCalendar 初期化
     const calendar = new Calendar(calendarEl, {
         plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -209,7 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollTime: '07:00:00',
         nowIndicator: true,
         allDayText: '終日',
-        events: '/tasks/events',
+        events: (fetchInfo, successCallback, failureCallback) => {
+            const url = new URL('/tasks/events', window.location.origin);
+            url.searchParams.append('start', fetchInfo.startStr);
+            url.searchParams.append('end', fetchInfo.endStr);
+            if (isFutureOnly) {
+                url.searchParams.append('future_only', '1');
+            }
+            fetch(url, {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(res => res.json())
+                .then(data => successCallback(data))
+                .catch(err => failureCallback(err));
+        },
 
         // 日付・時間枠クリック/選択時（新規追加）
         select: (info) => {

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\SharedCalendarController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,9 +52,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
+    // カレンダー共有設定 API
+    Route::post('/calendar/share-settings', [SharedCalendarController::class, 'updateSettings'])->name('calendar.share.settings');
+
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
+
+// カレンダー共有・外部予約用 公開ルート（未ログインでもアクセス可能）
+Route::get('/share/{token}', [SharedCalendarController::class, 'show'])->name('calendar.share');
+Route::get('/share/{token}/events', [SharedCalendarController::class, 'events'])->name('calendar.share.events');
+Route::post('/share/{token}/schedule', [SharedCalendarController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('calendar.share.store');
 
 // ヘルスチェック用エンドポイント（内部情報を非公開化）
 Route::get('/health', function () {

@@ -59,6 +59,44 @@ class TaskCalendarTest extends TestCase
     }
 
     /**
+     * future_only=1 指定時に昨日以前（過去）のスケジュールが表示されないテスト
+     */
+    public function test_past_tasks_before_today_are_not_displayed(): void
+    {
+        $user = User::factory()->create();
+
+        // 過去（昨日）のタスク
+        $pastTask = Task::factory()->create([
+            'user_id' => $user->id,
+            'title' => '昨日のタスク',
+            'start_at' => now()->subDays(2)->setTime(10, 0),
+            'end_at' => now()->subDays(2)->setTime(11, 0),
+        ]);
+
+        // 今日以降のタスク
+        $futureTask = Task::factory()->create([
+            'user_id' => $user->id,
+            'title' => '今日のタスク',
+            'start_at' => now()->setTime(14, 0),
+            'end_at' => now()->setTime(15, 0),
+        ]);
+
+        // 1. future_only=1 指定時：今日以降のみ
+        $responseFuture = $this->actingAs($user)->getJson('/tasks/events?future_only=1');
+        $responseFuture->assertStatus(200)
+            ->assertJsonCount(1)
+            ->assertJsonFragment(['title' => '今日のタスク'])
+            ->assertJsonMissing(['title' => '昨日のタスク']);
+
+        // 2. 全期間（デフォルト）：過去のタスクも取得可能
+        $responseAll = $this->actingAs($user)->getJson('/tasks/events');
+        $responseAll->assertStatus(200)
+            ->assertJsonCount(2)
+            ->assertJsonFragment(['title' => '今日のタスク'])
+            ->assertJsonFragment(['title' => '昨日のタスク']);
+    }
+
+    /**
      * ユーザーは新規タスク・スケジュールを作成できるテスト
      */
     public function test_user_can_create_task_with_time_range_and_notes(): void

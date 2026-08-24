@@ -15,6 +15,11 @@ class TaskController extends Controller
     {
         $query = $request->user()->tasks();
 
+        // 「今日以降（未来）のみ表示」フィルター
+        if ($request->boolean('future_only', false)) {
+            $query->whereDate('end_at', '>=', now()->toDateString());
+        }
+
         if ($request->filled('start') && $request->filled('end')) {
             $start = $request->query('start');
             $end = $request->query('end');

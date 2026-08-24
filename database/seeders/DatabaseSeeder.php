@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
                 'name' => 'testuser',
                 'password' => Hash::make('Password123'),
                 'email_verified_at' => now(),
+                'share_token' => 'testuser-share-token-1234567890',
+                'is_calendar_shared' => true,
             ]
         );
 
@@ -31,6 +33,8 @@ class DatabaseSeeder extends Seeder
                 'name' => 'taro_yamada',
                 'password' => Hash::make('Password123'),
                 'email_verified_at' => now(),
+                'share_token' => 'taroyamada-share-token-1234567890',
+                'is_calendar_shared' => true,
             ]
         );
 
